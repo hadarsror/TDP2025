@@ -181,11 +181,9 @@ public class ShowtimeControllerIntegrationTest {
 
         // Extract the showtime ID from the response
         String responseJson = result.getResponse().getContentAsString();
-        System.out.println("Response JSON: " + responseJson); //todo delete
 
 
         Showtime createdShowtime = objectMapper.readValue(responseJson, Showtime.class);
-        System.out.println("Parsed Showtime ID: " + createdShowtime.getId());// todo delete
         Long showtimeId = createdShowtime.getId();
 
         // Update the showtime
