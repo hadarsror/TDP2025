@@ -1,96 +1,101 @@
-# Popcorn Palace Movie Ticket Booking System - Setup Guide
-
-## Overview
-Popcorn Palace is a RESTful API for a movie ticket booking system built with Spring Boot and PostgreSQL. The system allows management of movies, showtimes, and ticket bookings with comprehensive error handling and validation.
+# Popcorn Palace - Setup Instructions
 
 ## Prerequisites
-- Java JDK 17+
+Make sure you have the following installed on your machine:
+- Java 21 (or a compatible version)
+- Maven
 - Docker Desktop
-- Maven (or use the Maven wrapper included in the project)
-- An IDE of your choice (IntelliJ IDEA, Eclipse, VS Code with Java extensions)
 
-## Setup Instructions
+## Getting Started
 
-### 1. Clone the Repository
-```bash
-git clone [repository-url]  # todo add repository url
-cd popcorn-palace
-```
-
-### 2. Start the PostgreSQL Database
-The project includes a `compose.yml` file that configures a PostgreSQL container:
+### 1. Database Setup
+The application uses PostgreSQL database running in a Docker container. To set it up:
 
 ```bash
-# Start the database container
+# Start the PostgreSQL container
 docker-compose up -d
 ```
 
-This will start PostgreSQL with these connection details:
-- Host: localhost
-- Port: 5432
+This will start a PostgreSQL instance with the following configuration:
 - Database: popcorn-palace
+- Username: popcorn-palace
+- Password: popcorn-palace
+- Port: 5432
 
-### 3. Build the Application
+### 2. Building the Application
 ```bash
-# Using Maven
-mvn clean install
+# Navigate to the project root directory
+cd popcorn-palace
 
-# Or using Maven wrapper
-./mvnw clean install
+# Build the project with Maven
+mvn clean package
 ```
 
-### 4. Run the Application
+### 3. Running the Application
 ```bash
-# Using Maven
+# Run the application
+java -jar target/popcorn-palace-0.0.1-SNAPSHOT.jar
+```
+
+Alternatively, you can run it directly with Maven:
+```bash
 mvn spring-boot:run
-
-# Or using Maven wrapper
-./mvnw spring-boot:run
 ```
 
-The application will start and listen on port 8080. The database schema will be automatically created by Hibernate based on the entity models.
+The application will start on port 8080. You can access it at http://localhost:8080
 
-## API Endpoints
+### 4. Testing the Application
+There are several types of tests included in the project:
+- Unit tests for services
+- Integration tests for controllers
 
-### Movie Management
-- **Get all movies**:
-    - `GET /movies/all`
-    - Response: 200 OK with list of movies
+To run the tests:
+```bash
+mvn test
+```
 
-- **Add a movie**:
-    - `POST /movies`
-    - Request Body: `{ "title": "Sample Movie Title", "genre": "Action", "duration": 120, "rating": 8.7, "releaseYear": 2025 }`
-    - Response: 201 Created with created movie
+## API Documentation
 
-- **Update a movie**:
-    - `POST /movies/update/{movieTitle}`
-    - Request Body: `{ "title": "New Title", "genre": "Action", "duration": 120, "rating": 8.7, "releaseYear": 2025 }`
-    - Response: 200 OK
+The application provides the following APIs:
 
-- **Delete a movie**:
-    - `DELETE /movies/{movieTitle}`
-    - Response: 200 OK
+### Movies APIs
+- `GET /movies/all` - Get all movies
+- `POST /movies` - Add a new movie
+- `POST /movies/update/{title}` - Update a movie by title
+- `DELETE /movies/{title}` - Delete a movie by title
 
-### Showtime Management
-- **Get showtime by ID**:
-    - `GET /showtime/{showtimeId}`
-    - Response: 200 OK with showtime details
+### Showtimes APIs
+- `GET /showtime/{showtimeId}` - Get showtime by ID
+- `POST /showtime` - Add a new showtime
+- `POST /showtime/update/{showtimeId}` - Update a showtime
+- `DELETE /showtime/{showtimeId}` - Delete a showtime
 
-- **Add a showtime**:
-    - `POST /showtime`
-    - Request Body: `{ "movieId": 1, "price": 20.2, "theater": "Sample Theater", "startTime": "2025-02-14T11:47:46.125405Z", "endTime": "2025-02-14T14:47:46.125405Z" }`
-    - Response: 201 Created with created showtime
+### Bookings APIs
+- `POST /bookings` - Book a movie ticket
 
-- **Update a showtime**:
-    - `POST /showtime/update/{showtimeId}`
-    - Request Body: `{ "movieId": 1, "price": 50.2, "theater": "Sample Theater", "startTime": "2025-02-14T11:47:46.125405Z", "endTime": "2025-02-14T14:47:46.125405Z" }`
-    - Response: 200 OK
+## Schema Initialization
+If you want to initialize the database with the schema and sample data:
 
-- **Delete a showtime**:
-    - `DELETE /showtime/{showtimeId}`
-    - Response: 200 OK
+1. The schema will be created automatically on application startup due to the `spring.jpa.hibernate.ddl-auto=update` setting.
 
-### Booking Management
-- **Book a ticket**:
-    - `POST /bookings`
-    - Request Body: `{ "showtimeId": 1, "seatNumber": 15, "userId": "84438967-f68f-4fa0-b
+2. If you want to load the sample data, you can use the provided SQL scripts:
+```bash
+# Connect to the PostgreSQL container
+docker exec -it popcorn-palace_db_1 psql -U popcorn-palace -d popcorn-palace
+
+# In the PostgreSQL prompt, load the data
+\i /path/to/data.sql
+```
+
+## Troubleshooting
+
+### Database Connection Issues
+- Make sure Docker is running
+- Check if the PostgreSQL container is running with `docker ps`
+- Verify connection details in `application.yaml`
+
+### Application Startup Problems
+- Check the logs for error messages
+- Ensure port 8080 is not being used by another application
+- Verify Java version (21 or compatible)
+
